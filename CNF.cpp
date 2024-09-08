@@ -65,8 +65,10 @@ HeadNode *CreateClause(char *filename, int &valnum) // 读取文件并存储
     for (int i = 0; i < ClauseNum; i++)
     {
         Node *ptr = current->child;
+        cout << current->num << " : ";
         while (ptr)
         {
+            
             cout << ptr->data << ' ';
             ptr = ptr->next;
         }
@@ -75,7 +77,7 @@ HeadNode *CreateClause(char *filename, int &valnum) // 读取文件并存储
     }
     return begin;
 }
-status MemPos(HeadNode *head, Literal *ltr, int valnum)
+void MemPos(HeadNode *head, Literal *ltr, int valnum)
 {
     for (int i = 0; i < 2*valnum; i++)
     {
@@ -87,6 +89,7 @@ status MemPos(HeadNode *head, Literal *ltr, int valnum)
     while(clausetrav)
     {
         ltrtrav = clausetrav->child;
+        prev = nullptr;
         while(ltrtrav)
         {
             int n;

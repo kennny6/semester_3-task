@@ -1,6 +1,5 @@
 #include "global.h"
 
-
 void Update(Literal *ltr, Node *object, int n) // 删除整个子句时对子句下的元素进行更新
 {
     Literal *pre, *cur;
@@ -18,13 +17,17 @@ void Update(Literal *ltr, Node *object, int n) // 删除整个子句时对子句
         cur = cur->next;
     }
 }
-void Update(Literal *ltr, Literal *target, Node *tochange, int n)//删除单个元素时，对下一元素的 pre 进行更新
+void Update(Literal *ltr, Literal *target, Node *tochange, int n) // 删除单个元素时，对下一元素的 pre 进行更新
 {
     Literal *p = ltr[n].next;
     while (p)
     {
         if (p->pos == tochange)
+        {
             p->pre = target->pre;
+            break;
+        }
+        p = p->next;
     }
 }
 void DeleteNode(Literal *ltr, HeadNode *trash, int valnum) // 删除子句中的结点元素
@@ -59,35 +62,50 @@ status CheckSolo(HeadNode *head) // 检查是否存在单子句
     {
         if (ptr->num == 1)
             return TRUE;
+        ptr = ptr->next;
     }
     return FALSE;
 }
-status SoloClause(HeadNode *head, Literal *ltr, int valnum) // 对存在单子句的情况进行处理
+status SoloClause(HeadNode* &head, Literal *ltr, int valnum, int *res ,int &flag) // 对存在单子句的情况进行处理
 {
+    flag = 0;
     HeadNode *clausetrav = head;
     while (clausetrav)
     {
         if (clausetrav->num == 1)
         {
-            /*删除单子句*/
+            /*删除单子句 并在答案中赋值*/
             int n;
             if (clausetrav->child->data < 0)
+            {
                 n = clausetrav->child->data + valnum;
+                res[-clausetrav->child->data - 1] = -1;
+            }
             else
+            {
                 n = clausetrav->child->data + valnum - 1;
+                res[clausetrav->child->data - 1] = 1;
+            }
             HeadNode *pre, *cur;
-            pre = ltr[n].uncle;
-            cur = ltr[n].parent;
+            Literal *find = ltr[n].next;
+            while(find)
+            {
+                if(find->pos == clausetrav->child)
+                    break;
+                find = find->next;
+            }
+            pre = find->uncle;
+            cur = find->parent;
             DeleteNode(ltr, clausetrav, valnum);
             if (pre == nullptr)
                 head = cur->next;
             else
                 pre->next = cur->next;
             delete cur;
-
-            if(head == nullptr)
+            clausetrav = pre;
+            if (head == nullptr)
                 return TRUE;
-            
+
             /*删除含有单子句元素的子句*/
             Literal *ltrp = ltr[n].next;
             while (ltrp)
@@ -102,31 +120,33 @@ status SoloClause(HeadNode *head, Literal *ltr, int valnum) // 对存在单子�
                     pre->next = current->next;
                 delete current;
 
-                ltrp = ltrp->next;
+                ltrp = ltr[n].next;
             }
 
-            if(head == nullptr)
+            if (head == nullptr)
                 return TRUE;
 
             /*删除子句中含有的单子句元素反值*/
-            int m;
-            if (clausetrav->child->data > 0)
-                m = -clausetrav->child->data + valnum;
-            else
-                m = -clausetrav->child->data + valnum - 1;
+            int m = 39 - n;
+            
             ltrp = ltr[m].next;
             while (ltrp)
             {
                 ltrp->parent->num--;
 
                 /* 此 处 判 断 该 CNF 文 件 是 否 有 解 */
-                if(ltrp->parent->num == 0)
+                if (ltrp->parent->num == 0)
                 {
-                    Destroy(head,ltr,valnum);
+                    if (clausetrav->child->data < 0)
+                        res[-clausetrav->child->data - 1] = 0;
+                    else
+                        res[clausetrav->child->data - 1] = 0;
+                    Destroy(head, ltr, valnum);
                     return NORESULT;
                 }
-                    
-                
+                else if(ltrp->parent->num == 1)
+                    flag = 1;
+
                 Node *pre, *current;
                 pre = ltrp->pre;
                 current = ltrp->pos;
@@ -138,8 +158,8 @@ status SoloClause(HeadNode *head, Literal *ltr, int valnum) // 对存在单子�
                     if (current->next->data < 0)
                         tochange = current->next->data + valnum;
                     else
-                        tochange = -current->next->data + valnum - 1;
-                    Update(ltr,ltrp,current->next,tochange);
+                        tochange = current->next->data + valnum - 1;
+                    Update(ltr, ltrp, current->next, tochange);
                 }
 
                 if (pre == nullptr)
@@ -157,5 +177,7 @@ status SoloClause(HeadNode *head, Literal *ltr, int valnum) // 对存在单子�
                 ltrp = ltr[m].next;
             }
         }
+        clausetrav = clausetrav->next;
     }
+    return TRUE;
 }
