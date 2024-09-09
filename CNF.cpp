@@ -1,3 +1,4 @@
+#define _CRT_SECURE_NO_WARNINGS 1
 #include "global.h"
 
 HeadNode *CreateClause(char *filename, int &valnum) // 读取文件并存储
@@ -17,7 +18,7 @@ HeadNode *CreateClause(char *filename, int &valnum) // 读取文件并存储
         fin >> flag;
     }
 
-    /*对文件内容进行读取*/
+    /* 对文件内容进行读取 */
     int ValNum, ClauseNum;
     fin >> trash >> ValNum >> ClauseNum;
     valnum = ValNum;
@@ -61,21 +62,23 @@ HeadNode *CreateClause(char *filename, int &valnum) // 读取文件并存储
     }
     fin.close();
 
-    current = begin; // 输出已存储数据
-    for (int i = 0; i < ClauseNum; i++)
-    {
-        Node *ptr = current->child;
-        while (ptr)
-        {
-            cout << ptr->data << ' ';
-            ptr = ptr->next;
-        }
-        cout << '0' << endl;
-        current = current->next;
-    }
+    // current = begin; // 输出已存储数据
+    // for (int i = 0; i < ClauseNum; i++)
+    // {
+    //     Node *ptr = current->child;
+    //     cout << current->num << " : ";
+    //     while (ptr)
+    //     {
+            
+    //         cout << ptr->data << ' ';
+    //         ptr = ptr->next;
+    //     }
+    //     cout << '0' << endl;
+    //     current = current->next;
+    // }
     return begin;
 }
-status MemPos(HeadNode *head, Literal *ltr, int valnum)
+void MemPos(HeadNode *head, Literal *ltr, int valnum)
 {
     for (int i = 0; i < 2*valnum; i++)
     {
@@ -87,6 +90,7 @@ status MemPos(HeadNode *head, Literal *ltr, int valnum)
     while(clausetrav)
     {
         ltrtrav = clausetrav->child;
+        prev = nullptr;
         while(ltrtrav)
         {
             int n;

@@ -1,5 +1,5 @@
-#ifndef _GLOBAL_H_
-#define _GLOBAL_H_
+#ifndef _GLOBAL_H
+#define _GLOBAL_H
 
 #include <iostream>
 #include <time.h>
@@ -38,16 +38,21 @@ typedef struct literal
 
 // 函 数 头
 HeadNode *CreateClause(char *filename, int &valnum);
-status MemPos(HeadNode *, Literal *, int);
+void MemPos(HeadNode *, Literal *, int);
+
 void DeleteNode(Literal *ltr, HeadNode *trash, int valnum);
 status CheckSolo(HeadNode *head);
-status SoloClause(HeadNode *head, Literal *ltr, int valnum);
-status Dpll(HeadNode *head, Literal *ltr, int valnum);
+status SoloClause(HeadNode *&head, Literal *ltr, int valnum, int *, int &flag);
+
+status Dpll(HeadNode *&head, Literal *ltr, int valnum, int *, int &flag);
+
 void CopyHeadNode(HeadNode *copy, HeadNode *stencil);
 void CopyNode(Node *copy, Node *stencil);
 HeadNode *Copy(HeadNode *stencil);
-void CopyLiteralPos(Literal *copy, Literal *stencil);
-Literal *Copy(Literal *ltr, int valnum);
+
+
+// void CopyLiteral(Literal *copy,Literal *ltr, int valnum);
+
 void Destroy(HeadNode *head, Literal *ltr, int valnum);
 
 #endif
