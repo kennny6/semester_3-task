@@ -12,34 +12,29 @@ using namespace std;
 #define NORESULT 0
 typedef int status;
 
-// 结 构 体 定 义 
+// 结 构 体 定 义
 typedef struct node
 {
     int data;
-    struct node *next;
-}Node;
+    struct node *next_node;
 
-typedef struct head
-{
-    int num;
-    struct head *next;
-    Node *child;
-}HeadNode;
+    struct node *parent;
+    struct node *uncle;
+    struct node *pre;
+    struct node *next_same;
+    struct node *prev_same;
+} Node;
+
+typedef Node HeadNode;
 
 typedef struct literal
 {
     int n;
-    HeadNode *parent;
-    HeadNode *uncle;
-    Node *pos;
-    Node *pre;
-    struct literal *next;
-}Literal;
-
+    Node *next;
+} Literal;
 
 // 函 数 头
-HeadNode *CreateClause(char *filename, int &valnum);
-void MemPos(HeadNode *, Literal *, int);
+HeadNode *CreateClause(char *filename, int &valnum, Literal *&);
 
 void DeleteNode(Literal *ltr, HeadNode *trash, int valnum);
 status CheckSolo(HeadNode *head);
@@ -47,10 +42,7 @@ status SoloClause(HeadNode *&head, Literal *ltr, int valnum, int *, int &flag);
 
 status Dpll(HeadNode *&head, Literal *ltr, int valnum, int *, int &flag);
 
-void CopyHeadNode(HeadNode *copy, HeadNode *stencil);
-void CopyNode(Node *copy, Node *stencil);
-HeadNode *Copy(HeadNode *stencil);
-
+HeadNode *Copy(HeadNode *stencil, Literal *&ltr, int valnum);
 
 // void CopyLiteral(Literal *copy,Literal *ltr, int valnum);
 

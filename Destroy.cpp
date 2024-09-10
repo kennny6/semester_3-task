@@ -6,13 +6,13 @@ void Destroy(HeadNode *head, Literal *ltr, int valnum)
     if(head == nullptr)
         return;
     HeadNode *trav = head;
-    HeadNode *next = head->next;
+    HeadNode *next = head->next_same;
     while (next)
     {
         DeleteNode(ltr, head, valnum);
         delete head;
         head = next;
-        next = next->next;
+        next = next->next_same;
     }
     DeleteNode(ltr, head, valnum);
     delete head;

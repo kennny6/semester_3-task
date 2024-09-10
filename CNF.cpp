@@ -1,7 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS 1
 #include "global.h"
 
-HeadNode *CreateClause(char *filename, int &valnum) // 读取文件并存储
+HeadNode *CreateClause(char *filename, int &valnum, Literal *&ltr) // 读取文件并存储
 {
     ifstream fin(filename);
     if (!fin)
@@ -22,14 +22,23 @@ HeadNode *CreateClause(char *filename, int &valnum) // 读取文件并存储
     int ValNum, ClauseNum;
     fin >> trash >> ValNum >> ClauseNum;
     valnum = ValNum;
+    ltr = new Literal[valnum * 2];
+    for (int i = 0; i < 2 * valnum; i++)
+    {
+        ltr[i].n = 0;
+        ltr[i].next = nullptr;
+    }
+
     HeadNode *begin = new HeadNode;
     HeadNode *current = begin;
+    HeadNode *pre = nullptr;
     for (int i = 0; i < ClauseNum; i++)
     {
-        current->num = 0;
-        current->child = new Node;
+        current->data = 0;
+        current->next_node = new Node;
 
-        Node *now = current->child;
+        Node *now = current->next_node;
+        Node *pre_node = nullptr;
         int temp;
         fin >> temp;
         if (temp == 0)
@@ -38,80 +47,90 @@ HeadNode *CreateClause(char *filename, int &valnum) // 读取文件并存储
             now = nullptr;
             continue;
         }
+
+        int n;
+        if (temp < 0)
+            n = temp + valnum;
+        else
+            n = temp + valnum - 1;
         now->data = temp;
-        current->num++;
+        now->parent = current;
+        now->uncle = pre;
+        now->pre = pre_node;
+
+        if (ltr[n].next)
+            ltr[n].next->prev_same = now;
+        now->next_same = ltr[n].next;
+        now->prev_same = nullptr;
+        ltr[n].next = now;
+        ltr[n].n++;
+        current->data++;
 
         fin >> temp;
         while (temp != 0)
         {
-            now->next = new Node;
-            now = now->next;
+            now->next_node = new Node;
+            pre_node = now;
+            now = now->next_node;
+
             now->data = temp;
-            current->num++;
+            int n;
+            if (temp < 0)
+                n = temp + valnum;
+            else
+                n = temp + valnum - 1;
+            now->parent = current;
+            now->uncle = pre;
+            now->pre = pre_node;
+
+            if (ltr[n].next)
+                ltr[n].next->prev_same = now;
+            now->next_same = ltr[n].next;
+            now->prev_same = nullptr;
+            ltr[n].next = now;
+            ltr[n].n++;
+            current->data++;
+
             fin >> temp;
         }
-        now->next = nullptr;
+        now->next_node = nullptr;
         fin.get();
         if (i == ClauseNum - 1)
         {
-            current->next = nullptr;
+            current->next_same = nullptr;
             continue;
         }
-        current->next = new HeadNode;
-        current = current->next;
+        current->next_same = new HeadNode;
+        pre = current;
+        current = current->next_same;
     }
     fin.close();
 
     // current = begin; // 输出已存储数据
     // for (int i = 0; i < ClauseNum; i++)
     // {
-    //     Node *ptr = current->child;
-    //     cout << current->num << " : ";
+    //     Node *ptr = current->next_node;
+    //     cout << current->data << " : ";
     //     while (ptr)
     //     {
-            
+
     //         cout << ptr->data << ' ';
-    //         ptr = ptr->next;
+    //         ptr = ptr->next_node;
     //     }
     //     cout << '0' << endl;
-    //     current = current->next;
+    //     current = current->next_same;
+    // }
+    // cout << "-----------------------" << endl;
+    // for (int i = 0; i < 2 * valnum; i++)
+    // {
+    //     Node *ptr = ltr[i].next;
+    //     cout << ltr[i].n << ": ";
+    //     while (ptr)
+    //     {
+    //         cout << ptr->data << ' ';
+    //         ptr = ptr->next_same;
+    //     }
+    //     cout << endl;
     // }
     return begin;
-}
-void MemPos(HeadNode *head, Literal *ltr, int valnum)
-{
-    for (int i = 0; i < 2*valnum; i++)
-    {
-        ltr[i].n = 0;
-        ltr[i].next = nullptr;
-    }
-    HeadNode *clausetrav = head;
-    HeadNode *uncle = nullptr;
-    Node *ltrtrav, *prev = nullptr;
-    while(clausetrav)
-    {
-        ltrtrav = clausetrav->child;
-        prev = nullptr;
-        while(ltrtrav)
-        {
-            int n;
-            if(ltrtrav->data < 0)
-                n = ltrtrav->data + valnum;
-            else
-                n = ltrtrav->data + valnum - 1;
-            Literal *p = new Literal;
-            p->parent = clausetrav;
-            p->uncle = uncle;
-            p->pre = prev;
-            p->pos = ltrtrav;
-            ltr[n].n++;
-            p->next = ltr[n].next;
-            ltr[n].next = p;// 头插法进入文字地址库
-
-            prev = ltrtrav;
-            ltrtrav = ltrtrav->next;
-        }
-        uncle = clausetrav;
-        clausetrav = clausetrav->next;
-    }
 }

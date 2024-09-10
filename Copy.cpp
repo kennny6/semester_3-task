@@ -2,80 +2,73 @@
 #include "global.h"
 
 /* 复 制 头 节 点 链 表 */
-void CopyHeadNode(HeadNode *copy, HeadNode *stencil)
+HeadNode *Copy(HeadNode *stencil, Literal *&ltr, int valnum)
 {
-    HeadNode *ps = stencil;
-    HeadNode *pc = copy;
-    while (ps->next)
-    {
-        pc->num = ps->num;
-        pc->next = new HeadNode;
-        ps = ps->next;
-        pc = pc->next;
-    }
-    pc->num = ps->num;
-    pc->next = nullptr;
-}
-/* 复 制 子 节 点 链 表 */
-void CopyNode(Node *copy, Node *stencil)
-{
-    Node *pc = copy;
-    Node *ps = stencil;
-    while (ps->next)
-    {
-        pc->data = ps->data;
-        pc->next = new Node;
-        ps = ps->next;
-        pc = pc->next;
-    }
-    pc->data = ps->data;
-    pc->next = nullptr;
-}
+    HeadNode *begin = new HeadNode; // 副本
+    HeadNode *stencil_trav = stencil;
 
-/* 复 制 CNF 结 构 链 表 */
-HeadNode *Copy(HeadNode *stencil)
-{
-    HeadNode *copy = new HeadNode;
-    CopyHeadNode(copy, stencil);
-    HeadNode *pc = copy;
-    HeadNode *ps = stencil;
-    while (pc)
+    HeadNode *current = begin;
+    HeadNode *pre = nullptr;
+    while (stencil_trav)
     {
-        pc->child = new Node;
-        CopyNode(pc->child, ps->child);
-        pc = pc->next;
-        ps = ps->next;
-    }
-    return copy;
-}
+//------------------------------复制子节点----------------------------//
+        current->data = stencil_trav->data;
+        current->next_node = new Node;
 
-// /* 复 制 文 字 地 址 库 */
-// void CopyLiteral(Literal *copy,Literal *ltr, int valnum)
-// {
-//     for (int i = 0; i < 2 * valnum; i++)
-//     {
-//         if (ltr[i].next == nullptr)
-//         {
-//             copy[i].next = nullptr;
-//             continue;
-//         }
-//         copy[i].next = new Literal;
-//         Literal *pc = copy[i].next;
-//         Literal *ps = ltr[i].next;
-//         while (ps->next)
-//         {
-//             pc->parent = ps->parent;
-//             pc->pos = ps->pos;
-//             pc->uncle = ps->uncle;
-//             pc->pre = ps->pre;
-//             pc->next = new Literal;
-//             pc = pc->next;
-//             ps = ps->next;
-//         }
-//         pc->parent = ps->parent;
-//         pc->pos = ps->pos;
-//         pc->uncle = ps->uncle;
-//         pc->pre = ps->pre;
-//         pc->next = nullptr;
-//     }
-// }
+        Node *now = current->next_node;
+        Node *pre_node = nullptr;
+        Node *sten_node_trav = stencil_trav->next_node;
+        while (sten_node_trav->next_node)
+        {
+            now->data = sten_node_trav->data;
+            now->parent = current;
+            now->uncle = pre;
+            now->pre = pre_node;
+            now->next_node = new Node;
+
+            int n;
+            if (now->data < 0)
+                n = now->data + valnum;
+            else
+                n = now->data + valnum - 1;
+            if (ltr[n].next)
+                ltr[n].next->prev_same = now;
+            now->next_same = ltr[n].next;
+            now->prev_same = nullptr;
+            ltr[n].next = now;
+            ltr[n].n++;
+            current->data++;
+
+            sten_node_trav = sten_node_trav->next_node;// 向 后 迭 代 
+            pre_node = now;
+            now = now->next_node;
+        }
+        now->data = sten_node_trav->data;
+        now->parent = current;
+        now->uncle = pre;
+        now->pre = pre_node;
+        now->next_node = nullptr;// 末位置空
+        
+        int n;
+        if (now->data < 0)
+            n = now->data + valnum;
+        else
+            n = now->data + valnum - 1;
+        if (ltr[n].next)
+            ltr[n].next->prev_same = now;
+        now->next_same = ltr[n].next;
+        now->prev_same = nullptr;
+        ltr[n].next = now;
+        ltr[n].n++;
+        current->data++;
+
+        stencil_trav = stencil_trav->next_same;
+        current->next_same = new Node;
+        pre = current;
+        current = current->next_same;
+    }
+    delete current;
+    pre->next_same = nullptr;
+
+    return begin;
+}

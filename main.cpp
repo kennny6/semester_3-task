@@ -14,14 +14,14 @@ int main(void)
     if(choice == 1)
     {
         char filename[] = "test.cnf";
-        HeadNode *head = CreateClause(filename,VALNUM);
+        Literal *ltr;
+        HeadNode *head = CreateClause(filename,VALNUM,ltr);
         int flag = CheckSolo(head);
 
-        Literal *ltr = new Literal[VALNUM*2];
+        
         int *result = new int[VALNUM];
         for(int i = 0; i < VALNUM; i++)
             result[i] = 0;
-        MemPos(head,ltr,VALNUM);
 
         StartTime = clock();
         int outcome = Dpll(head, ltr, VALNUM, result, flag);
