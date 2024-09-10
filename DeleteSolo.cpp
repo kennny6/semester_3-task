@@ -12,6 +12,7 @@ void Update(Literal *ltr, Node *object, int n) // 删除整个子句时对子句
         {
             pre->next = cur->next;
             delete cur;
+            ltr[n].n--;
             break;
         }
         pre = cur;

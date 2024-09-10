@@ -82,6 +82,7 @@ void MemPos(HeadNode *head, Literal *ltr, int valnum)
 {
     for (int i = 0; i < 2*valnum; i++)
     {
+        ltr[i].n = 0;
         ltr[i].next = nullptr;
     }
     HeadNode *clausetrav = head;
@@ -103,7 +104,7 @@ void MemPos(HeadNode *head, Literal *ltr, int valnum)
             p->uncle = uncle;
             p->pre = prev;
             p->pos = ltrtrav;
-
+            ltr[n].n++;
             p->next = ltr[n].next;
             ltr[n].next = p;// 头插法进入文字地址库
 

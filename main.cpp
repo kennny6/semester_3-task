@@ -13,7 +13,7 @@ int main(void)
     
     if(choice == 1)
     {
-        char filename[] = "SAT_sample\\baseline\\timeprv\\sud00009.cnf";
+        char filename[] = "test.cnf";
         HeadNode *head = CreateClause(filename,VALNUM);
         int flag = CheckSolo(head);
 

@@ -28,6 +28,7 @@ typedef struct head
 
 typedef struct literal
 {
+    int n;
     HeadNode *parent;
     HeadNode *uncle;
     Node *pos;

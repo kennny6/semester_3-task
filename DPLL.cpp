@@ -14,14 +14,17 @@ status Dpll(HeadNode *&head, Literal *ltr, int valnum, int *res, int &flag)
     }
 
     /* 分裂法递归求解 */
-    int i = 0;
-    while (i < 2 * valnum)
+    int n = 0,max = 0,i;
+    while (n < 2 * valnum)
     {
-        if (ltr[i].next != nullptr)
-            break;
-        i++;
+        if(max < ltr[n].n)
+        {
+            max = ltr[n].n;
+            i = n;
+        }
+        n++;
     }
-    if (i == 2 * valnum)
+    if (max == 0)
         return TRUE;
     if (head == nullptr)
         return TRUE;
