@@ -5,24 +5,24 @@ void Update(Literal *ltr, Node *object, int n) // 删除整个子句时对子句
 {
     ltr[n].n--;
 
-    if (object->prev_same)
+    if (object->left)
     {
-        Node *pre = object->prev_same;
-        pre->next_node = object->next_same;
+        Node *pre = object->left;
+        pre->right = object->right;
     }
-    if (object->next_same)
+    if (object->right)
     {
-        Node *next = object->next_same;
-        next->prev_same = object->prev_same;
+        Node *next = object->right;
+        next->left = object->left;
     }
-    if (!object->prev_same)
-        ltr[n].next = object->next_same;
+    if (!object->left)
+        ltr[n].next = object->right;
 }
 void DeleteNode(Literal *ltr, HeadNode *trash, int valnum) // 删除子句中的结点元素
 {
     Node *pre, *current;
-    pre = trash->next_node;
-    current = pre->next_node;
+    pre = trash->down;
+    current = pre->down;
     int n;
     while (current)
     {
@@ -33,7 +33,7 @@ void DeleteNode(Literal *ltr, HeadNode *trash, int valnum) // 删除子句中的
         Update(ltr, pre, n);
         delete pre;
         pre = current;
-        current = current->next_node;
+        current = current->down;
     }
     if (pre->data < 0)
         n = pre->data + valnum;
@@ -41,7 +41,7 @@ void DeleteNode(Literal *ltr, HeadNode *trash, int valnum) // 删除子句中的
         n = pre->data + valnum - 1;
     Update(ltr, pre, n);
     delete pre;
-    trash->next_node = nullptr;
+    trash->down = nullptr;
 }
 status CheckSolo(HeadNode *head) // 检查是否存在单子句
 {
@@ -50,7 +50,7 @@ status CheckSolo(HeadNode *head) // 检查是否存在单子句
     {
         if (ptr->data == 1)
             return TRUE;
-        ptr = ptr->next_same;
+        ptr = ptr->right;
     }
     return FALSE;
 }
@@ -64,41 +64,41 @@ status SoloClause(HeadNode *&head, Literal *ltr, int valnum, int *res, int &flag
         {
             /* 删除单子句 并在答案中赋值 */
             int n;
-            if (clausetrav->next_node->data < 0)
+            if (clausetrav->down->data < 0)
             {
-                n = clausetrav->next_node->data + valnum;
-                res[-clausetrav->next_node->data - 1] = -1;
+                n = clausetrav->down->data + valnum;
+                res[-clausetrav->down->data - 1] = -1;
             }
             else
             {
-                n = clausetrav->next_node->data + valnum - 1;
-                res[clausetrav->next_node->data - 1] = 1;
+                n = clausetrav->down->data + valnum - 1;
+                res[clausetrav->down->data - 1] = 1;
             }
             HeadNode *pre, *cur;
             if (!ltr[n].next)
                 return FALSE;
-            pre = clausetrav->next_node->uncle;
-            cur = clausetrav->next_node->parent;
+            pre = clausetrav->down->uncle;
+            cur = clausetrav->down->parent;
 
-            if (cur->next_same)
+            if (cur->right)
             {
-                Node *tochange = cur->next_same->next_node;
+                Node *tochange = cur->right->down;
                 while (tochange)
                 {
                     tochange->uncle = pre;
-                    tochange = tochange->next_node;
+                    tochange = tochange->down;
                 }
             }
 
             DeleteNode(ltr, clausetrav, valnum);
             if (pre == nullptr)
             {
-                head = cur->next_same;
-                clausetrav = cur->next_same;
+                head = cur->right;
+                clausetrav = cur->right;
             }
             else
             {
-                pre->next_same = cur->next_same;
+                pre->right = cur->right;
                 clausetrav = pre; // 更新clausetrav
             }
             delete cur;
@@ -117,24 +117,24 @@ status SoloClause(HeadNode *&head, Literal *ltr, int valnum, int *res, int &flag
                     if (pre)
                         clausetrav = pre;
                     else
-                        clausetrav = current->next_same;
+                        clausetrav = current->right;
                 }
 
                 /* 更新待删除句子后一句子的文字地址库 */
-                if (current->next_same)
+                if (current->right)
                 {
-                    Node *tochange = current->next_same->next_node;
+                    Node *tochange = current->right->down;
                     while (tochange)
                     {
                         tochange->uncle = pre;
-                        tochange = tochange->next_node;
+                        tochange = tochange->down;
                     }
                 }
                 DeleteNode(ltr, current, valnum);
                 if (pre == nullptr)
-                    head = current->next_same;
+                    head = current->right;
                 else
-                    pre->next_same = current->next_same;
+                    pre->right = current->right;
                 delete current;
 
                 ltrp = ltr[n].next;
@@ -154,10 +154,10 @@ status SoloClause(HeadNode *&head, Literal *ltr, int valnum, int *res, int &flag
                 /* 此 处 判 断 该 CNF 文 件 是 否 有 解 */
                 if (ltrp->parent->data == 0)
                 {
-                    if (clausetrav->next_node->data < 0)
-                        res[-clausetrav->next_node->data - 1] = 0;
+                    if (clausetrav->down->data < 0)
+                        res[-clausetrav->down->data - 1] = 0;
                     else
-                        res[clausetrav->next_node->data - 1] = 0;
+                        res[clausetrav->down->data - 1] = 0;
                     Destroy(head, ltr, valnum);
                     return NORESULT;
                 }
@@ -169,28 +169,27 @@ status SoloClause(HeadNode *&head, Literal *ltr, int valnum, int *res, int &flag
                 current = ltrp;
 
                 /* 删除反值元素时，更新文字地址库 */
-                int tochange;
-                if (current->next_node)
+                if (current->down)
                 {
-                    current->next_node->pre = current->pre;
+                    current->down->pre = current->pre;
                 }
 
                 if (pre == nullptr)
                 {
-                    ltrp->parent->next_node = current->next_node;
+                    ltrp->parent->down = current->down;
                     Update(ltr, current, m);
                     delete current;
                 }
                 else
                 {
-                    pre->next_node = current->next_node;
+                    pre->down = current->down;
                     Update(ltr, current, m);
                     delete current;
                 }
                 ltrp = ltr[m].next;
             }
         }
-        clausetrav = clausetrav->next_same;
+        clausetrav = clausetrav->right;
     }
     return TRUE;
 }

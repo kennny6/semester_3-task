@@ -13,18 +13,18 @@ HeadNode *Copy(HeadNode *stencil, Literal *&ltr, int valnum)
     {
 //------------------------------复制子节点----------------------------//
         current->data = stencil_trav->data;
-        current->next_node = new Node;
+        current->down = new Node;
 
-        Node *now = current->next_node;
+        Node *now = current->down;
         Node *pre_node = nullptr;
-        Node *sten_node_trav = stencil_trav->next_node;
-        while (sten_node_trav->next_node)
+        Node *sten_node_trav = stencil_trav->down;
+        while (sten_node_trav->down)
         {
             now->data = sten_node_trav->data;
             now->parent = current;
             now->uncle = pre;
             now->pre = pre_node;
-            now->next_node = new Node;
+            now->down = new Node;
 
             int n;
             if (now->data < 0)
@@ -32,22 +32,21 @@ HeadNode *Copy(HeadNode *stencil, Literal *&ltr, int valnum)
             else
                 n = now->data + valnum - 1;
             if (ltr[n].next)
-                ltr[n].next->prev_same = now;
-            now->next_same = ltr[n].next;
-            now->prev_same = nullptr;
+                ltr[n].next->left = now;
+            now->right = ltr[n].next;
+            now->left = nullptr;
             ltr[n].next = now;
             ltr[n].n++;
-            current->data++;
 
-            sten_node_trav = sten_node_trav->next_node;// 向 后 迭 代 
+            sten_node_trav = sten_node_trav->down;// 向 后 迭 代 
             pre_node = now;
-            now = now->next_node;
+            now = now->down;
         }
         now->data = sten_node_trav->data;
         now->parent = current;
         now->uncle = pre;
         now->pre = pre_node;
-        now->next_node = nullptr;// 末位置空
+        now->down = nullptr;// 末位置空
         
         int n;
         if (now->data < 0)
@@ -55,20 +54,46 @@ HeadNode *Copy(HeadNode *stencil, Literal *&ltr, int valnum)
         else
             n = now->data + valnum - 1;
         if (ltr[n].next)
-            ltr[n].next->prev_same = now;
-        now->next_same = ltr[n].next;
-        now->prev_same = nullptr;
+            ltr[n].next->left = now;
+        now->right = ltr[n].next;
+        now->left = nullptr;
         ltr[n].next = now;
         ltr[n].n++;
-        current->data++;
 
-        stencil_trav = stencil_trav->next_same;
-        current->next_same = new Node;
+        stencil_trav = stencil_trav->right;
+        current->right = new Node;
         pre = current;
-        current = current->next_same;
+        current = current->right;
     }
     delete current;
-    pre->next_same = nullptr;
+    pre->right = nullptr;
 
+    current = begin; // 输出已存储数据
+    cout << "-----------------------" << endl;
+    while (current)
+    {
+        Node *ptr = current->down;
+        cout << current->data << " : ";
+        while (ptr)
+        {
+
+            cout << ptr->data << ' ';
+            ptr = ptr->down;
+        }
+        cout << '0' << endl;
+        current = current->right;
+    }
+    cout << "-----------------------" << endl;
+    for (int i = 0; i < 2 * valnum; i++)
+    {
+        Node *ptr = ltr[i].next;
+        cout << ltr[i].n << ": ";
+        while (ptr)
+        {
+            cout << ptr->data << ' ';
+            ptr = ptr->right;
+        }
+        cout << endl;
+    }
     return begin;
 }

@@ -35,9 +35,9 @@ HeadNode *CreateClause(char *filename, int &valnum, Literal *&ltr) // 读取文�
     for (int i = 0; i < ClauseNum; i++)
     {
         current->data = 0;
-        current->next_node = new Node;
+        current->down = new Node;
 
-        Node *now = current->next_node;
+        Node *now = current->down;
         Node *pre_node = nullptr;
         int temp;
         fin >> temp;
@@ -59,9 +59,9 @@ HeadNode *CreateClause(char *filename, int &valnum, Literal *&ltr) // 读取文�
         now->pre = pre_node;
 
         if (ltr[n].next)
-            ltr[n].next->prev_same = now;
-        now->next_same = ltr[n].next;
-        now->prev_same = nullptr;
+            ltr[n].next->left = now;
+        now->right = ltr[n].next;
+        now->left = nullptr;
         ltr[n].next = now;
         ltr[n].n++;
         current->data++;
@@ -69,9 +69,9 @@ HeadNode *CreateClause(char *filename, int &valnum, Literal *&ltr) // 读取文�
         fin >> temp;
         while (temp != 0)
         {
-            now->next_node = new Node;
+            now->down = new Node;
             pre_node = now;
-            now = now->next_node;
+            now = now->down;
 
             now->data = temp;
             int n;
@@ -84,41 +84,41 @@ HeadNode *CreateClause(char *filename, int &valnum, Literal *&ltr) // 读取文�
             now->pre = pre_node;
 
             if (ltr[n].next)
-                ltr[n].next->prev_same = now;
-            now->next_same = ltr[n].next;
-            now->prev_same = nullptr;
+                ltr[n].next->left = now;
+            now->right = ltr[n].next;
+            now->left = nullptr;
             ltr[n].next = now;
             ltr[n].n++;
             current->data++;
 
             fin >> temp;
         }
-        now->next_node = nullptr;
+        now->down = nullptr;
         fin.get();
         if (i == ClauseNum - 1)
         {
-            current->next_same = nullptr;
+            current->right = nullptr;
             continue;
         }
-        current->next_same = new HeadNode;
+        current->right = new HeadNode;
         pre = current;
-        current = current->next_same;
+        current = current->right;
     }
     fin.close();
 
     // current = begin; // 输出已存储数据
     // for (int i = 0; i < ClauseNum; i++)
     // {
-    //     Node *ptr = current->next_node;
+    //     Node *ptr = current->down;
     //     cout << current->data << " : ";
     //     while (ptr)
     //     {
 
     //         cout << ptr->data << ' ';
-    //         ptr = ptr->next_node;
+    //         ptr = ptr->down;
     //     }
     //     cout << '0' << endl;
-    //     current = current->next_same;
+    //     current = current->right;
     // }
     // cout << "-----------------------" << endl;
     // for (int i = 0; i < 2 * valnum; i++)
@@ -128,9 +128,9 @@ HeadNode *CreateClause(char *filename, int &valnum, Literal *&ltr) // 读取文�
     //     while (ptr)
     //     {
     //         cout << ptr->data << ' ';
-    //         ptr = ptr->next_same;
+    //         ptr = ptr->right;
     //     }
     //     cout << endl;
-    // }
+    //}
     return begin;
 }

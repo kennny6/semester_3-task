@@ -16,13 +16,13 @@ typedef int status;
 typedef struct node
 {
     int data;
-    struct node *next_node;
+    struct node *down; // 下一结点
 
-    struct node *parent;
-    struct node *uncle;
-    struct node *pre;
-    struct node *next_same;
-    struct node *prev_same;
+    struct node *parent;// 连接头节点
+    struct node *uncle;// 连接前一头节点
+    struct node *pre;// 上一结点
+    struct node *right;// 同变量的下一结点
+    struct node *left;// 同变量的上一结点
 } Node;
 
 typedef Node HeadNode;

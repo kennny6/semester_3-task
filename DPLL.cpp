@@ -37,13 +37,13 @@ status Dpll(HeadNode *&head, Literal *ltr, int valnum, int *res, int &flag)
     }
     HeadNode *coh = Copy(head, col, valnum);
     /* 向 原 CNF 结 构 体 尾 部 添 加 所 选 元 素 真 值 */
-    for (trav = head; trav->next_same; trav = trav->next_same)
+    for (trav = head; trav->right; trav = trav->right)
         ;
 
-    trav->next_same = new HeadNode;
-    trav->next_same->next_node = new Node;
-    trav->next_same->next_same = nullptr;
-    trav->next_same->data = 1;
+    trav->right = new HeadNode;
+    trav->right->down = new Node;
+    trav->right->right = nullptr;
+    trav->right->data = 1;
     flag = TRUE;
 
     int data;
@@ -51,17 +51,17 @@ status Dpll(HeadNode *&head, Literal *ltr, int valnum, int *res, int &flag)
         data = i - valnum;
     else
         data = i + 1 - valnum;
-    trav->next_same->next_node->data = -data; //  >0 真值
-    trav->next_same->next_node->next_node = nullptr;
+    trav->right->down->data = -data; //  >0 真值
+    trav->right->down->down = nullptr;
 
-    Node *now = trav->next_same->next_node;
-    now->parent = trav->next_same;
+    Node *now = trav->right->down;
+    now->parent = trav->right;
     now->uncle = trav;
     now->pre = nullptr;
 
-    ltr[2 * valnum - i - 1].next->prev_same = now;
-    now->next_same = ltr[2 * valnum - i - 1].next;
-    now->prev_same = nullptr;
+    ltr[2 * valnum - i - 1].next->left = now;
+    now->right = ltr[2 * valnum - i - 1].next;
+    now->left = nullptr;
     ltr[2 * valnum - i - 1].next = now;
     ltr[2 * valnum - i - 1].n++;
 
@@ -72,32 +72,32 @@ status Dpll(HeadNode *&head, Literal *ltr, int valnum, int *res, int &flag)
     }
 
     /* 向 副 本 CNF 结 构 体 尾 部 添 加 所 选 元 素 假 值 */
-    for (trav = coh; trav->next_same; trav = trav->next_same)
+    for (trav = coh; trav->right; trav = trav->right)
         ;
 
-    trav->next_same = new HeadNode;
-    trav->next_same->next_node = new Node;
-    trav->next_same->next_same = nullptr;
-    trav->next_same->data = 1;
+    trav->right = new HeadNode;
+    trav->right->down = new Node;
+    trav->right->right = nullptr;
+    trav->right->data = 1;
     flag = TRUE;
 
     if (i < valnum)
         data = i - valnum;
     else
         data = i + 1 - valnum;
-    trav->next_same->next_node->data = data; //  >0 真值
-    trav->next_same->next_node->next_node = nullptr;
+    trav->right->down->data = data; //  >0 真值
+    trav->right->down->down = nullptr;
 
-    now = trav->next_same->next_node;
-    now->parent = trav->next_same;
+    now = trav->right->down;
+    now->parent = trav->right;
     now->uncle = trav;
     now->pre = nullptr;
     
-    ltr[i].next->prev_same = now;
-    now->next_same = ltr[i].next;
-    now->prev_same = nullptr;
-    ltr[i].next = now;
-    ltr[i].n++;
+    col[i].next->left = now;
+    now->right = col[i].next;
+    now->left = nullptr;
+    col[i].next = now;
+    col[i].n++;
 
     int outcome = Dpll(coh, col, valnum, res, flag);
     return outcome;
