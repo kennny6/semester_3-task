@@ -68,32 +68,32 @@ HeadNode *Copy(HeadNode *stencil, Literal *&ltr, int valnum)
     delete current;
     pre->right = nullptr;
 
-    current = begin; // 输出已存储数据
-    cout << "-----------------------" << endl;
-    while (current)
-    {
-        Node *ptr = current->down;
-        cout << current->data << " : ";
-        while (ptr)
-        {
+    // current = begin; // 输出已存储数据
+    // cout << "-----------------------" << endl;
+    // while (current)
+    // {
+    //     Node *ptr = current->down;
+    //     cout << current->data << " : ";
+    //     while (ptr)
+    //     {
 
-            cout << ptr->data << ' ';
-            ptr = ptr->down;
-        }
-        cout << '0' << endl;
-        current = current->right;
-    }
-    cout << "-----------------------" << endl;
-    for (int i = 0; i < 2 * valnum; i++)
-    {
-        Node *ptr = ltr[i].next;
-        cout << ltr[i].n << ": ";
-        while (ptr)
-        {
-            cout << ptr->data << ' ';
-            ptr = ptr->right;
-        }
-        cout << endl;
-    }
+    //         cout << ptr->data << ' ';
+    //         ptr = ptr->down;
+    //     }
+    //     cout << '0' << endl;
+    //     current = current->right;
+    // }
+    // cout << "-----------------------" << endl;
+    // for (int i = 0; i < 2 * valnum; i++)
+    // {
+    //     Node *ptr = ltr[i].next;
+    //     cout << ltr[i].n << ": ";
+    //     while (ptr)
+    //     {
+    //         cout << ptr->data << ' ';
+    //         ptr = ptr->right;
+    //     }
+    //     cout << endl;
+    // }
     return begin;
 }
