@@ -4,7 +4,8 @@
 #include <iostream>
 #include <time.h>
 #include <fstream>
-
+#include <cstdlib>
+#include <string>
 using namespace std;
 
 #define TRUE 1
@@ -33,8 +34,8 @@ typedef struct literal
     Node *next;
 } Literal;
 
-// 函 数 头
-HeadNode *CreateClause(char *filename, int &valnum, Literal *&);
+/* ----------DPLL 系列函数---------- */ 
+HeadNode *CreateClause(string filename, int &valnum, Literal *&);
 
 void DeleteNode(Literal *ltr, HeadNode *trash, int valnum);
 status CheckSolo(HeadNode *head);
@@ -44,8 +45,15 @@ status Dpll(HeadNode *&head, Literal *ltr, int valnum, int *, int &flag);
 
 HeadNode *Copy(HeadNode *stencil, Literal *&ltr, int valnum);
 
-// void CopyLiteral(Literal *copy,Literal *ltr, int valnum);
-
 void Destroy(HeadNode *head, Literal *ltr, int valnum);
+
+/* ----------X-Sukodu 系列函数---------- */ 
+status is_valid(int sukodu[][9], int x, int y);
+status DFS(int sukodu[][9], int x, int y);
+status Las_vegas(int sukodu[][9]);
+void Sudoku_CNF(int a[][9]);
+void showSudoku(const int board[][9]);
+void Dig_holes(int sudoku[][9], int high_bond);
+void Menu(int sudoku[][9], int answer[][9]);
 
 #endif

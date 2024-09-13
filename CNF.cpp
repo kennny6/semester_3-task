@@ -1,9 +1,10 @@
 #define _CRT_SECURE_NO_WARNINGS 1
 #include "global.h"
 
-HeadNode *CreateClause(char *filename, int &valnum, Literal *&ltr) // 读取文件并存储
+HeadNode *CreateClause(string filename, int &valnum, Literal *&ltr) // 读取文件并存储
 {
-    ifstream fin(filename);
+    string ext_1 = ".cnf";
+    ifstream fin(filename + ext_1);
     if (!fin)
     {
         cout << "Fail to open the file." << endl;
