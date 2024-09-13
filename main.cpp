@@ -13,8 +13,12 @@ int main(void)
     
     if(choice == 1)
     {
-        char filename[] = "test.cnf";
-        HeadNode *head = CreateClause(filename,VALNUM);
+        string filename;
+        cout << "\tEnter the filename you wanted: ";
+        cin >> filename;
+        string ext = ".cnf";
+        string ext2 = ".res";
+        HeadNode *head = CreateClause(filename + ext,VALNUM);
         int flag = CheckSolo(head);
 
         Literal *ltr = new Literal[VALNUM*2];
@@ -27,7 +31,7 @@ int main(void)
         int outcome = Dpll(head, ltr, VALNUM, result, flag);
         EndTime = clock();
 
-        ofstream fout("result.res");
+        ofstream fout(filename + ext2);
         if(outcome == FALSE)
         {
             fout << "The result is : 0" << endl;

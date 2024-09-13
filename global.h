@@ -4,6 +4,7 @@
 #include <iostream>
 #include <time.h>
 #include <fstream>
+#include <string>
 
 using namespace std;
 
@@ -38,7 +39,7 @@ typedef struct literal
 
 
 // 函 数 头
-HeadNode *CreateClause(char *filename, int &valnum);
+HeadNode *CreateClause(string filename, int &valnum);
 void MemPos(HeadNode *, Literal *, int);
 
 void DeleteNode(Literal *ltr, HeadNode *trash, int valnum);
