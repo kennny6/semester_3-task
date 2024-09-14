@@ -354,7 +354,7 @@ void Menu(int sudoku[][9], int answer[][9])
     {
         Sudoku_CNF(sudoku);
         int VALNUM;
-        char filename[] = "xsudoku.cnf";
+        string filename = "xsudoku";
         Literal *ltr;
         HeadNode *head = CreateClause(filename, VALNUM, ltr);
         int flag = CheckSolo(head);
